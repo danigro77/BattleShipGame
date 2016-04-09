@@ -1,6 +1,7 @@
 ## Battleship
 
-Ruby 2.2.4
+Ruby 2.2.4 
+
 Rails 4.2.6
 
 #### How to run it locally
@@ -34,7 +35,8 @@ Rails 4.2.6
     bundle install
     ```
 5. Running the Rails server
-For now this does not work in RubyMine
+    
+    For now this does not work in RubyMine
     ```
     rails s
     ```
