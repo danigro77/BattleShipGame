@@ -1,1 +1,25 @@
-Welcome to the game!
+<div class="main main-identify" ng-if="!loggedIn">
+  <div ng-if="!showLogin && !showSignup">
+    <h3 class="identify">Identify yourself!</h3>
+    <button class="btn btn-sm" ng-click="userCreate()">Sign up</button>
+    <button class="btn btn-sm" ng-click="userLogin()">Sign in</button>
+  </div>
+
+  <div ng-if="showLogin">
+    <h3>Sign In</h3>
+    <label for="name">Name: </label><input id="name" ng-model="player.name" type="text" />
+    <label for="password">Password: </label><input ng-model="player.email" id="password" type="password" />
+    <img src="../images/go_back.png" title="Go back" ng-click="goBack('showLogin')" />
+    <button class="btn btn-sm" ng-click="signIn(player)">Sign in</button>
+  </div>
+
+  <div ng-if="showSignup">
+    <h3>Sign Up</h3>
+    <label for="name1">Name: </label><input id="name1" ng-model="player.name" type="text" placeholder="Name needs to be unique"/>
+    <label for="password1">Password: </label><input ng-model="player.email" id="password1" type="password" />
+    <img src="../images/go_back.png" title="Go back" ng-click="goBack('showSignup')" />
+    <button class="btn btn-sm" ng-click="signUp(player)">Sign up</button>
+  </div>
+</div>
+
+<div class="main" ng-if="loggedIn">Welcome to the game, {{currentUser.name}}!</div>
