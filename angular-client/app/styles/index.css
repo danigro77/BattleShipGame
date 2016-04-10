@@ -1,0 +1,67 @@
+body {
+  background: black;
+}
+#wrapper {
+  width: 1000px;
+  margin: 0 auto;
+}
+a {
+  color: darkgrey;
+}
+a:hover {
+  color: grey;
+  text-decoration: none;
+}
+.browsehappy {
+  text-align: center;
+  background: firebrick;
+  padding: 15px;
+  color: ghostwhite;
+  margin: 0;
+}
+.browsehappy a {
+  color: lightgrey;
+}
+
+/*  ==== HEADER ====  */
+
+header {
+  background: url("../images/battleship.jpg") no-repeat;
+  background-size:  1000px 300px;
+  height: 300px;
+}
+header h1 {
+  margin: 0;
+  padding-top: 50px;
+  padding-left: 30px;
+  color: #E7FEF6;
+}
+
+/*  ==== CONTAINER ====  */
+
+.container {
+  background: lightgray;
+  min-height: 50px;
+  width: 100%;
+  padding: 30px;
+}
+
+
+/*  ==== FOOTER ====  */
+
+footer {
+  border-top: 1px #E7FEF6 solid;
+  margin: 30px 0;
+  padding-top: 10px;
+  color: #E7FEF6;
+  font-size: 0.85em;
+}
+footer .name {
+  float: left;
+}
+footer a {
+  color: lightgrey;
+}
+footer .location-date {
+  float: right;
+}

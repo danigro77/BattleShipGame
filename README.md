@@ -1,11 +1,9 @@
-## Battleship
+## Battleship Game
 
-Ruby 2.2.4 
-
-Rails 4.2.6
+Ruby 2.2.4 | Rails 4.2.6 | Angular 1.4.0 | Node 5.6.0 | PostgreSQL 9.5.1
 
 #### How to run it locally
-1. Clone the repo
+1. Clone the [repository](https://github.com/danigro77/BattleShipGame)
     ```
     git clone git@github.com:danigro77/BattleShipGame.git
     ```
@@ -44,6 +42,23 @@ Rails 4.2.6
     ```
     rails s
     ```
-
-
+6. Angular
+    * Make sure uou have npm and bower installed
+        ```
+        brew install node
+        brew install npm
+        npm install -g bower
+        ```
+    * Install the packages
+        ```
+        cd angular-client
+        npm install
+        bower install
+        ```
+    * Run Grunt server
+        ```
+        cd angular-client
+        grunt serve
+        ```
+7. Visit: [http://localhost:9000](http://localhost:9000)
 
