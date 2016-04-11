@@ -15,21 +15,3 @@
   text-align: center;
   margin-top: -15px;
 }
-
-.main-identify h3 {
-  float: left;
-  margin: 0;
-}
-.main-identify button {
-  float: right;
-  margin-left: 10px;
-}
-.main-identify label {
-  margin-left: 100px;
-  margin-right: 10px;
-}
-.main-identify img {
-  float: right;
-  width: 40px;
-  margin-top: -4px;
-}

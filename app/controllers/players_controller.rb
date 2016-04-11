@@ -36,8 +36,8 @@ class PlayersController < ApplicationController
   end
   def valid_data
     @errors = []
-    @errors << "Fill out you name!" unless @player_data[:name] || @player_data['name']
-    @errors << "Fill out you password!" unless @player_data[:password] || @player_data['password']
+    @errors << "Fill out you name" unless @player_data[:name] || @player_data['name']
+    @errors << "Fill out you password" unless @player_data[:password] || @player_data['password']
     @errors.length == 0
   end
 
