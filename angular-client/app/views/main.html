@@ -1,1 +1,6 @@
-Welcome to the game!
+<button class="player player-logout btn" ng-if="loggedIn" ng-click="logOut()">
+  Log out, {{currentPlayer.name}}?
+</button>
+<div player class="main main-identify" ng-if="!loggedIn"></div>
+
+<div class="main" ng-if="loggedIn">Welcome to the game, {{currentPlayer.name}}!</div>

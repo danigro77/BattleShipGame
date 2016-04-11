@@ -10,6 +10,7 @@ group :development do
 end
 
 gem 'pg'
+gem 'active_model_serializers', git: 'git@github.com:rails-api/active_model_serializers.git', branch: '0-8-stable'
 
 group :test do
   gem 'rspec-rails', '~> 3.0'
