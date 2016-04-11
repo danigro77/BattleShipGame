@@ -1,6 +1,24 @@
 <button class="player player-logout btn" ng-if="loggedIn" ng-click="logOut()">
   Log out, {{currentPlayer.name}}?
 </button>
+
+<div class="error" ng-if="errorMessage != undefined">
+  <p ng-repeat="msg in errorMessage">{{msg}}</p>
+</div>
 <div player class="main main-identify" ng-if="!loggedIn"></div>
 
-<div class="main" ng-if="loggedIn">Welcome to the game, {{currentPlayer.name}}!</div>
+<div class="main" ng-if="loggedIn">
+  Welcome to the game, {{currentPlayer.name}}!
+  <div class="online-list" ng-if="onlinePlayers.length == 0">
+    <p>Sorry, no other player is right now online. Try again later!</p>
+  </div>
+  <div class="online-list" ng-if="onlinePlayers.length > 0">
+    <p>Pick a player for a new game:</p>
+    <table>
+      <tr ng-repeat="player in onlinePlayers">
+        <td>{{player.name}}</td>
+        <td><button class="btn" ng-click="startNewGame(player)">New Game</button></td>
+      </tr>
+    </table>
+  </div>
+</div>

@@ -1,29 +1,17 @@
 'use strict'
 
-angular.module('battleShipGameApp').controller("PlayerCtrl", ['$scope', '$cookieStore', 'PlayerService', (scope, cookieStore, PlayerService)->
+angular.module('battleShipGameApp').controller("PlayerCtrl", ['$scope', '$cookieStore', 'PlayerService', 'ErrorHelper', (scope, cookieStore, PlayerService, ErrorHelper)->
   scope.currentPlayer = cookieStore.get('currentPlayer')
   scope.showLogin = false
   scope.showSignup = false
   scope.player = {}
+  scope.helper = ErrorHelper
 
   scope.userLogin = ->
     scope.showLogin = true
 
   scope.userCreate = ->
     scope.showSignup = true
-
-  generateErrorMessage = (message) ->
-    msgs = []
-    if message["players"]
-      msgs.push message["players"].join("\n")
-
-    if message["name"]
-      msgs.push "Name " + message["name"].join(".\nName ")
-
-    if message["password"]
-      msgs.push "Password " + message["password"].join(".\nPassword ")
-
-    msgs.join(".\n") + '.'
 
   scope.signIn = (player) ->
     PlayerService.getCurrentPlayer(player).then (response) ->
@@ -34,7 +22,7 @@ angular.module('battleShipGameApp').controller("PlayerCtrl", ['$scope', '$cookie
         scope.currentPlayer = player
         cookieStore.put('currentPlayer', player)
     , (errors) ->
-      scope.errorMessage = generateErrorMessage(errors.data)
+      scope.$parent.errorMessage = scope.helper.errorMessage(errors)
 
   scope.signUp = (player) ->
     PlayerService.saveNewPlayer(player).then (response) ->
@@ -45,7 +33,7 @@ angular.module('battleShipGameApp').controller("PlayerCtrl", ['$scope', '$cookie
         scope.currentPlayer = player
         cookieStore.put('currentPlayer', player)
     , (errors) ->
-      scope.errorMessage = generateErrorMessage(errors.data)
+      scope.$parent.errorMessage = scope.helper.errorMessage(errors)
 
   scope.goBack = (currentView) ->
     switch currentView
@@ -56,11 +44,11 @@ angular.module('battleShipGameApp').controller("PlayerCtrl", ['$scope', '$cookie
 
   scope.$watch 'showLogin', (newVal, oldVal) ->
     if newVal != oldVal && newVal == false
-      scope.errorMessage = undefined
+      scope.$parent.errorMessage = undefined
 
   scope.$watch 'showSignup', (newVal, oldVal) ->
     if newVal != oldVal && newVal == false
-      scope.errorMessage = undefined
+      scope.$parent.errorMessage = undefined
 
   scope.$watch 'currentPlayer', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined

@@ -15,3 +15,26 @@
   text-align: center;
   margin-top: -15px;
 }
+
+.main div.online-list {
+  margin: 15px 200px;
+}
+.main div.online-list p {
+  font-size: 1.2em;
+}
+table tr:hover {
+  background: ghostwhite;
+}
+table td:first-child {
+  width: 300px;
+}
+table td {
+  padding: 3px 10px;
+}
+table button {
+  background: ghostwhite;
+  box-shadow: grey 2px 2px 1px;
+}
+table button:hover {
+  background: lightgray;
+}
