@@ -1,7 +1,4 @@
 class PlayersController < ApplicationController
-  include ActionController::Live
-  include ActionController::MimeResponds
-  Mime::Type.register "text/event-stream", :stream
 
   before_action :clean_params, only: [:current, :new]
 
@@ -26,7 +23,7 @@ class PlayersController < ApplicationController
 
   # GET  /api/players/online/:id(.:format) players#online
   def online
-    players = Player.get_online(params[:id])
+    players = Player.all_online(params[:id])
     if players
       render json: players, each_serializer: PlayerSerializer
     else
