@@ -10,12 +10,20 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
   getOnlinePlayers = ->
     PlayerService.getOnlinePlayers(scope.currentPlayer.id).then (response) ->
       if response.status == 200
-        scope.onlinePlayers = response.data['players']
+        players = response.data['players']
+        for p in players
+          if p.id == scope.currentPlayer.id
+            players.splice(players.indexOf(p), 1)
+            break
+        scope.onlinePlayers = players
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
-  if scope.loggedIn
-    getOnlinePlayers()
+  scope.initPlayers = ->
+    if scope.loggedIn
+      setInterval ->
+        getOnlinePlayers()
+      , 5000
 
   scope.logOut = ->
     PlayerService.playerLogout(scope.currentPlayer.id).then (response) ->

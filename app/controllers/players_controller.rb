@@ -1,4 +1,7 @@
 class PlayersController < ApplicationController
+  include ActionController::Live
+  include ActionController::MimeResponds
+  Mime::Type.register "text/event-stream", :stream
 
   before_action :clean_params, only: [:current, :new]
 
