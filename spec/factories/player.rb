@@ -5,9 +5,9 @@ FactoryGirl.define do
     logged_in true
 
     trait :not_logged_in do
-      logged_in :false
+      logged_in false
     end
-    factory :offline_player, traits: [:with_active_initiated_games]
+    factory :offline_player, traits: [:not_logged_in]
 
     #  create(:player_with_initiated_games, game_count: 4)
 
