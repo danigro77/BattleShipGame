@@ -11,10 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160413174223) do
+ActiveRecord::Schema.define(version: 20160413221640) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "boards", force: :cascade do |t|
+    t.integer  "player_id"
+    t.integer  "game_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "fields", force: :cascade do |t|
+    t.integer  "board_id"
+    t.integer  "row_index"
+    t.integer  "column_index"
+    t.boolean  "is_ship_field", default: false
+    t.boolean  "is_uncovered",  default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "games", force: :cascade do |t|
     t.integer  "player1_id"

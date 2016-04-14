@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       put 'logout/:id' => 'players#logout'
     end
     scope '/games' do
+      get '/current/:id' => 'games#current'
       post '/new/:player1/:player2' => 'games#new'
     end
   end

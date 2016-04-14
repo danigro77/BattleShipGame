@@ -6,6 +6,7 @@ class Player < ActiveRecord::Base
   has_many :invited_games, class_name: "Game", foreign_key: :player2_id
   has_many :current_games, class_name: "Game", foreign_key: :current_player_id
   has_many :won_games, class_name: "Game", foreign_key: :winner_id
+  has_many :boards
 
   scope :all_online, -> (id) { where(logged_in: true).where.not(id: id).order('LOWER(name) ASC') }
 
