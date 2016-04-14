@@ -10,5 +10,8 @@ Rails.application.routes.draw do
       get '/current/:id' => 'games#current'
       post '/new/:player1/:player2' => 'games#new'
     end
+    scope '/fields' do
+      put '/uncover/:id' => 'fields#uncover'
+    end
   end
 end

@@ -10,6 +10,10 @@ class Game < ActiveRecord::Base
   belongs_to :current_player, class_name: Player
   has_many :boards
 
+  def change_current_player
+    self.current_player_id = current_player_id == player1_id ? player2_id : player1_id
+    errors.add(:current_player_id, "could not be saved") unless self.save
+  end
 
   private
 

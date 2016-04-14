@@ -59,6 +59,12 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         scope.currentGame.opponentsGame.board = gameData.boards[0]
     scope.currentGame.myTurn = gameData['current_player_id'] == scope.currentPlayer.id
 
+  updateGame = ->
+    setInterval ->
+      if scope.currentGameId && scope.gameView && scope.loggedIn
+        getGame(scope.currentGameId.id)
+    , 5000
+
   getGame = (id) ->
     GameService.getGame(id).then (response) ->
       if response.status == 200
@@ -72,6 +78,8 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         cleanGameData(response.data['game'])
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
+
+  updateGame()
 
 #  WATCH
 #  ================================
