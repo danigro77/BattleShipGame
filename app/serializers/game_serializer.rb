@@ -1,5 +1,7 @@
 class GameSerializer < ApplicationSerializer
-  attributes :id, :current_player_id
+
+  attributes :id, :current_player_id, :paused
+
   has_one :player1, serializer: PlayerSerializer
   has_one :player2, serializer: PlayerSerializer
   has_many :boards, serializer: BoardSerializer

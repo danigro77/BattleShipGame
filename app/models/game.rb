@@ -10,15 +10,28 @@ class Game < ActiveRecord::Base
   belongs_to :current_player, class_name: Player
   has_many :boards
 
+  scope :pending_invitations, -> (player_id) { where(player2_id: player_id).where('winner_id is null').order('updated_at DESC') }
+
   def change_current_player
-    self.current_player_id = current_player_id == player1_id ? player2_id : player1_id
     errors.add(:current_player_id, "could not be saved") unless self.save
+  end
+
+  def both_players_online?
+    player1.logged_in && player2.logged_in
+  end
+
+  def not_paused?
+    !paused
   end
 
   private
 
   def set_current_player
-    self.current_player = player1
+    if self.current_player == nil || self.current_player == player2
+      self.current_player = player1
+    else
+      self.current_player = player2
+    end
   end
 
   def init_boards

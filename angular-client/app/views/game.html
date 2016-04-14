@@ -1,13 +1,13 @@
-<h1>{{gameData.myGame.name}} vs {{gameData.opponentsGame.name}}</h1>
+<h1><span ng-class="whosTurn('me')">{{gameData.myGame.name}}</span> vs <span ng-class="whosTurn('them')">{{gameData.opponentsGame.name}}</span></h1>
 <table class="opponents-board">
   <tr ng-repeat="row in gameData.opponentsGame.board.board_fields">
-    <td ng-if="gameData.myTurn" ng-repeat="field in row | orderBy: 'column_index' as filtered_result track by field.column_index" ng-class="getOpponentsClasses(field)" ng-click="selectField(field)">{{field.id}} {{field.column_index}}</td>
-    <td ng-if="!gameData.myTurn" ng-repeat="field in row | orderBy: 'column_index' as filtered_result track by field.column_index" ng-class="getOpponentsClasses(field)">{{field.id}}</td>
+    <td ng-if="gameData.myTurn" ng-repeat="field in row | orderBy: 'column_index' as filtered_result track by field.column_index" ng-class="getOpponentsClasses(field)" ng-click="selectField(field)"></td>
+    <td ng-if="!gameData.myTurn" ng-repeat="field in row | orderBy: 'column_index' as filtered_result track by field.column_index" ng-class="getOpponentsClasses(field)"></td>
   </tr>
 </table>
 <table class="my-board">
   <tr ng-repeat="row in gameData.myGame.board.board_fields">
-    <td ng-repeat="field in row" ng-class="getMyClasses(field)"></td>
+    <td ng-repeat="field in row | orderBy: 'column_index' as filtered_result track by field.column_index" ng-class="getMyClasses(field)"></td>
   </tr>
 </table>
 

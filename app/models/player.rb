@@ -8,7 +8,9 @@ class Player < ActiveRecord::Base
   has_many :won_games, class_name: "Game", foreign_key: :winner_id
   has_many :boards
 
-  scope :all_online, -> (id) { where(logged_in: true).where.not(id: id).order('LOWER(name) ASC') }
+  belongs_to :playing_game, class_name: "Game", foreign_key: :playing_game_id
+
+  scope :all_online, -> (id) { where(logged_in: true).where.not(id: id).where('playing_game_id is NULL').order('LOWER(name) ASC') }
 
   def all_games
     initialized_games + invited_games

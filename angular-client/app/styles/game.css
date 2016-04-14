@@ -3,6 +3,10 @@
   color: #E7FEF6;
   text-shadow: 2px 2px gray;
 }
+.game h1 .turn {
+  font-weight: 600;
+  color: firebrick;
+}
 .game td {
   padding: 0;
   border: 1px darkgray solid;
