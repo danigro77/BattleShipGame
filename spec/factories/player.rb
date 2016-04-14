@@ -53,5 +53,24 @@ FactoryGirl.define do
     factory :player_with_lost_games, traits: [:with_lost_games]
 
     factory :player_with_game_mix, traits: [:with_active_initiated_games, :with_active_invited_games, :with_won_games, :with_lost_games]
+
+    trait :with_boards do
+      ignore do
+        board_count 2
+      end
+      after(:create) do |player, evaluator|
+        create_list(:board, evaluator.board_count, game: create(:game))
+      end
+    end
+    factory :player_with_boards, traits: [:with_boards]
+
+    trait :with_playing_game do
+      playing_game { create(:game) }
+    end
+    factory :player_playing_game, traits: [:with_playing_game]
+
+
+    
   end
+
 end

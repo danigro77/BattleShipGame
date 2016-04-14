@@ -14,6 +14,8 @@ RSpec.describe Player, type: :model do
       expect( FactoryGirl.create(:player_with_won_games) ).to be_valid
       expect( FactoryGirl.create(:player_with_lost_games) ).to be_valid
       expect( FactoryGirl.create(:player_with_game_mix) ).to be_valid
+      expect( FactoryGirl.create(:player_with_boards) ).to be_valid
+      expect( FactoryGirl.create(:player_playing_game) ).to be_valid
     end
     it "is invalid without a name" do
       expect( FactoryGirl.build(:player, name: nil)).not_to be_valid
@@ -62,6 +64,10 @@ RSpec.describe Player, type: :model do
         expect(player_with_games.won_games.count).to eq num_of_games
       end
     end
+
+    it { should have_many(:boards) }
+    it { should belong_to(:playing_game) }
+
   end
 
   # Scopes
@@ -69,7 +75,7 @@ RSpec.describe Player, type: :model do
   describe 'Scopes' do
     let!(:offline_player) { FactoryGirl.create(:offline_player) }
 
-    it 'returns only online player other than themselfes' do
+    it 'returns only online player other than themselves' do
       expect(Player.all_online(player.id)).to_not include [offline_player]
       expect(Player.all_online(player.id)).to_not include [player]
       Player.all_online(player.id).each do |online_player|

@@ -16,5 +16,10 @@ FactoryGirl.define do
 
     factory :game_winner_p1, traits: [:with_winner_p1]
     factory :game_winner_p2, traits: [:with_winner_p2]
+
+    trait :paused do
+      paused true
+    end
+    factory :paused_game, traits: [:paused]
   end
 end
