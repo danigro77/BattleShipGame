@@ -39,6 +39,35 @@ RSpec.describe PlayersController, :type => :controller do
     end
   end
 
+  describe "GET #online" do
+    let!(:online_players) { [FactoryGirl.create(:player), FactoryGirl.create(:player)] }
+    let!(:offline_player) { FactoryGirl.create(:offline_player) }
+    let(:expected_result) { generate_online_result(online_players) }
+
+    it 'loads successfully' do
+      get :online, {id: player.id}
+      expect(response).to be_success
+      expect(response).to have_http_status(200)
+    end
+
+    it 'returns all online players' do
+      get :online, {id: player.id}
+      result = JSON.parse(response.body)["players"]
+      expect(result).to eq expected_result
+    end
+
+    it 'returns not the current player' do
+      get :online, {id: player.id}
+      result = JSON.parse(response.body)["players"]
+      expect(result).to_not include generate_online_result([player])
+    end
+    it 'returns not the offline player' do
+      get :online, {id: player.id}
+      result = JSON.parse(response.body)["players"]
+      expect(result).to_not include generate_online_result([offline_player])
+    end
+  end
+
   describe "POST #new" do
     let(:new_name) { "#{player.name}_2" }
     let(:new_player_params) { {name: new_name, password: player.password} }
@@ -79,5 +108,25 @@ RSpec.describe PlayersController, :type => :controller do
       expect(result).to eq "can't be blank"
       expect(response).to have_http_status(400)
     end
+  end
+
+  describe "PUT #logout" do
+    it 'loads successfully' do
+      post :logout, {id: player.id}
+      expect(response).to be_success
+      expect(response).to have_http_status(200)
+    end
+  end
+
+#   Helpers
+
+  def generate_online_result(online_players)
+    online_players.sort_by(&:name).inject([]) do |result, player|
+      result << {
+          "id" => player.id,
+          "name" =>player.name
+      }
+    end
+
   end
 end

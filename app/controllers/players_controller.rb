@@ -1,26 +1,52 @@
 class PlayersController < ApplicationController
 
-  before_action :clean_params
+  before_action :clean_params, only: [:current, :new]
 
   # current GET  /api/players/current(.:format) players#current
   def current
     if valid_data
       player = Player.find_by(@player_data)
       if player
-        render json: player, serializer: PlayerSerializer
+        player.logged_in = true
+        if player.save
+          render json: player, serializer: PlayerSerializer
+        else
+          render json: player.errors, status: 400
+        end
       else
-        render json: ["Player not found!"], status: 404
+        render json: ["Player not found"], status: 404
       end
     else
       render json: @errors, status: 400
     end
   end
 
+  # GET  /api/players/online/:id(.:format) players#online
+  def online
+    players = Player.all_online(params[:id])
+    if players
+      render json: players, each_serializer: PlayerSerializer
+    else
+      render json: {players: ["data not found."]}, status: 404
+    end
+  end
+
   # new POST  /api/players/new(.:format)     players#new
   def new
     player = Player.new(@player_data)
+    player.logged_in = true
     if player.save
       render json: player, serializer: PlayerSerializer
+    else
+      render json: player.errors, status: 400
+    end
+  end
+
+  # PUT  /api/players/logout/:id(.:format) players#logout
+  def logout
+    player = Player.find(params[:id])
+    if player.update({logged_in: false})
+      render nothing: true, status: 200
     else
       render json: player.errors, status: 400
     end

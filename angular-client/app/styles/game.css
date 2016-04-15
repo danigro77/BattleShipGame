@@ -1,0 +1,49 @@
+.game h1 {
+  margin-top: 0;
+  color: #E7FEF6;
+  text-shadow: 2px 2px gray;
+}
+.game h1 .turn {
+  font-weight: 600;
+  color: firebrick;
+}
+.game td {
+  padding: 0;
+  border: 1px darkgray solid;
+}
+.game table {
+  float: left;
+}
+.opponents-board td {
+  width: 55px !important;
+  height: 55px;
+  background-size: 30px 30px;
+}
+table.my-board {
+  float: right;
+}
+.my-board td {
+  width: 35px !important;
+  height: 35px;
+  background-size: 16px 16px;
+}
+.game table td.water {
+  background-color: deepskyblue;
+}
+.game table td.ship {
+  background-color: darkolivegreen;
+}
+.game table td.hit {
+  background-image: url("../images/explosion.png");
+
+}
+.game table.my-board td.hit.ship {
+  background-color: firebrick ;
+}
+.game table td {
+  background-repeat: no-repeat;
+}
+.game button {
+  float: right;
+  margin-top: 20px;
+}
