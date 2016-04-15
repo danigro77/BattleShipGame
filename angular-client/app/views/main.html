@@ -24,6 +24,7 @@
     </div>
   </div>
 
-  <div game class="game" ng-if="gameView" game-data="currentGame"></div>
+  <div class="loading" ng-if="loading">Fetching your game...</div>
+  <div game class="game" ng-if="gameView && !loading" game-data="currentGame"></div>
 
 </div>

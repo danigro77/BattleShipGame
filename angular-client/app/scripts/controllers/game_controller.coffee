@@ -25,6 +25,7 @@ angular.module('battleShipGameApp').controller("GameCtrl", ['$scope', '$cookieSt
     if field.is_uncovered
       classes.push 'hit'
     classes.push if field.is_ship_field then 'ship' else 'water'
+    classes.push field.ship_type if field.ship_type
     classes.join(" ")
 
   scope.selectField = (field) ->

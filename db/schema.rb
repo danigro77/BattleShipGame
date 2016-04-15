@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160414222922) do
+ActiveRecord::Schema.define(version: 20160415050819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20160414222922) do
     t.boolean  "is_uncovered",  default: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "ship_id"
   end
 
   create_table "games", force: :cascade do |t|
@@ -53,5 +54,14 @@ ActiveRecord::Schema.define(version: 20160414222922) do
   end
 
   add_index "players", ["name"], name: "index_players_on_name", unique: true, using: :btree
+
+  create_table "ships", force: :cascade do |t|
+    t.integer  "board_id"
+    t.string   "ship_type"
+    t.integer  "size"
+    t.boolean  "sunk",       default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

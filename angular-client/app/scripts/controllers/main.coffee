@@ -4,7 +4,6 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
   scope.currentPlayer = cookieStore.get('currentPlayer')
   scope.currentGameId = cookieStore.get('currentGame')
 
-
   scope.errorMessage = undefined
   scope.helper = ErrorHelper
 
@@ -13,6 +12,7 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
       scope.gameView = scope.currentGameId != undefined
     scope.loggedIn = scope.currentPlayer != undefined
     scope.playerView = scope.loggedIn && scope.currentGameId == undefined
+    scope.loading = false
 
 #  PLAYERS
 #  ================================
@@ -26,12 +26,9 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
-  if scope.loggedIn
-    getOnlinePlayers()
-
   scope.initPlayers = ->
     setInterval ->
-      if scope.loggedIn && !scope.gameView
+      if scope.loggedIn && !scope.gameView && !scope.loading
         getOnlinePlayers()
         checkForGameInvite()
     , 5000
@@ -45,6 +42,7 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         scope.loggedIn = false
         scope.gameView = false
         scope.playerView = false
+        scope.loading = false
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
@@ -82,6 +80,7 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
           scope.currentGame.myGame.board = gameData.boards[1]
           scope.currentGame.opponentsGame.board = gameData.boards[0]
       scope.currentGame.myTurn = gameData['current_player_id'] == scope.currentPlayer.id
+      scope.loading = false
 
   updateGame = ->
     setInterval ->
@@ -101,11 +100,13 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         scope.errorMessage = scope.helper.errorMessage(errors)
 
   scope.startNewGame = (player2) ->
+    scope.playerView = false
+    scope.loading = true
     GameService.initNewGame(scope.currentPlayer.id, player2.id).then (response) ->
       if response.status == 200
         cookieStore.put('currentGame', {id: response.data['game'].id})
         scope.currentGameId = cookieStore.get('currentGame')
-        scope.playerView = false
+        scope.loading = false
         cleanGameData(response.data['game'])
         updateGame()
     , (errors) ->
@@ -119,8 +120,6 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
       scope.gameView = true
     else if newVal == undefined
       scope.gameView = false
-      if scope.loggedIn && !scope.gameView
-        getOnlinePlayers()
 
   scope.$watch 'currentPlayer', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined
@@ -128,11 +127,15 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
   scope.$watch 'loggedIn', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined && newVal
-      getOnlinePlayers()
+#      getOnlinePlayers()
       scope.playerView = newVal && !scope.gameView
 
   scope.$watch 'gameView', (newVal, oldVal) ->
     if !newVal && scope.loggedIn
+      if scope.currentGameId
+        scope.loading = true
+        getGame(scope.currentGameId.id)
+        scope.gameView = true
       getOnlinePlayers()
       scope.playerView = true
     else if newVal
