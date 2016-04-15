@@ -39,6 +39,23 @@ class Board < ActiveRecord::Base
     fields.where(column_index: index)
   end
 
+  def lost?
+    stats[player.name] && stats[player.name][:sunken] == ships.length
+  end
+
+  def stats
+    stats = {}
+    stats[player.name] = {
+        sunken: 0,
+        intact: 0
+    }
+    ships.each do |ship|
+      ship.check_if_sunken unless ship.sunk
+      ship.sunk? ? (stats[player.name][:sunken] += 1) : (stats[player.name][:intact] += 1)
+    end
+    stats
+  end
+
 
   private
 
@@ -128,4 +145,5 @@ class Board < ActiveRecord::Base
       end
     end
   end
+
 end

@@ -3,7 +3,9 @@ class GamesController < ApplicationController
   def current
     if params[:id]
       game = Game.find(params[:id].to_i)
-      if game
+      if game.over?
+        render json: game, serializer: StatsSerializer
+      elsif game
         render json: game, serializer: GameSerializer
       else
         render json: game.errors, status: 400

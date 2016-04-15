@@ -4,4 +4,10 @@ class Ship < ActiveRecord::Base
   has_many :fields
   belongs_to :board
 
+  def check_if_sunken
+    if fields.map(&:is_uncovered).uniq == [true]
+      self.update({sunk: true})
+    end
+  end
+
 end

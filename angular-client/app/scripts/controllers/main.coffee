@@ -6,13 +6,26 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
   scope.errorMessage = undefined
   scope.helper = ErrorHelper
+  scope.loading = false
 
-  setViews = ->
-    if scope.currentGameId
-      scope.gameView = scope.currentGameId != undefined
+  setViews = (player, game, stats) ->
+    scope.playerView = player if player != undefined
+    scope.gameView = game if game != undefined
+    scope.statsView = stats if stats != undefined
+
+  initViews = ->
     scope.loggedIn = scope.currentPlayer != undefined
-    scope.playerView = scope.loggedIn && scope.currentGameId == undefined
-    scope.loading = false
+    game = scope.loggedIn && scope.currentGameId != undefined && !scope.currentGameId.won
+    stats = scope.loggedIn && scope.currentGameId != undefined && scope.currentGameId.won
+    player = scope.loggedIn && !game && !stats
+    setViews(player, game, stats)
+
+  playerViewOnly = ->
+    scope.loggedIn && !scope.gameView && !scope.statsView
+  gameViewOnly = ->
+    scope.loggedIn && !scope.playerView && !scope.statsView
+  statsViewOnly = ->
+    scope.loggedIn && !scope.playerView && !scope.gameView
 
 #  PLAYERS
 #  ================================
@@ -27,8 +40,11 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
       scope.errorMessage = scope.helper.errorMessage(errors)
 
   scope.initPlayers = ->
+    getPlayerData()
+
+  getPlayerData = ->
     setInterval ->
-      if scope.loggedIn && !scope.gameView && !scope.loading
+      if !scope.loading && playerViewOnly()
         getOnlinePlayers()
         checkForGameInvite()
     , 5000
@@ -40,62 +56,79 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         cookieStore.remove('currentGame')
         scope.currentPlayer = undefined
         scope.loggedIn = false
-        scope.gameView = false
-        scope.playerView = false
         scope.loading = false
+        setViews(false, false, false)
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
 #  GAMES
 #  ================================
   checkForGameInvite = ->
-    GameService.newGameInvite(scope.currentPlayer.id).then (response) ->
-      if response.status == 200
-        cookieStore.put('currentGame', {id: response.data['games'][0]})
-        scope.currentGameId = cookieStore.get('currentGame')
-        getGame(response.data['games'][0])
-    , (errors) ->
-      scope.errorMessage = scope.helper.errorMessage(errors)
+    if playerViewOnly() && !scope.loading
+      GameService.newGameInvite(scope.currentPlayer.id).then (response) ->
+        if response.status == 200
+          cookieStore.put('currentGame', {id: response.data['games'][0]})
+          scope.currentGameId = cookieStore.get('currentGame')
+          getGame(response.data['games'][0])
+      , (errors) ->
+        scope.errorMessage = scope.helper.errorMessage(errors)
+
+  setPlayer = (me, opponent) ->
+    scope.currentGame.myGame = me
+    scope.currentGame.opponentsGame = opponent
+
+  setBoards = (mine, opponets) ->
+    scope.currentGame.myGame.board = mine
+    scope.currentGame.opponentsGame.board = opponets
+
+  pausedGame = ->
+    cookieStore.remove('currentGame')
+    setViews(true, false, false)
 
   cleanGameData = (gameData) ->
     if gameData.paused
-      cookieStore.remove('currentGame')
-      scope.gameView = false
-      scope.playerView = true
+      pausedGame()
     else
       scope.currentGame = {}
       scope.currentGame.id = gameData['id']
       switch gameData['player1']['id']
         when scope.currentPlayer.id
-          scope.currentGame.myGame = gameData['player1']
-          scope.currentGame.opponentsGame = gameData['player2']
+          setPlayer(gameData['player1'], gameData['player2'])
         else
-          scope.currentGame.myGame = gameData['player2']
-          scope.currentGame.opponentsGame = gameData['player1']
+          setPlayer(gameData['player2'], gameData['player1'])
       switch gameData.boards[0]['player_id']
         when scope.currentPlayer.id
-          scope.currentGame.myGame.board = gameData.boards[0]
-          scope.currentGame.opponentsGame.board = gameData.boards[1]
+          setBoards(gameData.boards[0], gameData.boards[1])
         else
-          scope.currentGame.myGame.board = gameData.boards[1]
-          scope.currentGame.opponentsGame.board = gameData.boards[0]
+          setBoards(gameData.boards[1], gameData.boards[0])
       scope.currentGame.myTurn = gameData['current_player_id'] == scope.currentPlayer.id
-      scope.loading = false
+    scope.loading = false
+    setViews(false, true, false)
 
   updateGame = ->
-    setInterval ->
-      if !scope.currentGameId #TODO: find and fix bug
-        scope.currentGameId = cookieStore.get('currentGame')
-      if scope.currentGameId && scope.gameView && scope.loggedIn
-        getGame(scope.currentGameId.id)
-    , 5000
+    if gameViewOnly()
+      setInterval ->
+        if !scope.currentGameId #TODO: find and fix bug
+          scope.currentGameId = cookieStore.get('currentGame')
+        if scope.currentGameId && (scope.gameView || scope.statsView) && scope.loggedIn
+          getGame(scope.currentGameId.id)
+      , 5000
+
+  statsDataSetup = (data) ->
+    scope.gameStats = data
+    cookieStore.put('currentGame', {id: data.id, won: true})
+    setViews(false, false, true)
+    scope.loading = false
 
   getGame = (id) ->
-    if id != undefined
+    if id != undefined && scope.gameStats == undefined
       GameService.getGame(id).then (response) ->
-        scope.playerView = false
+        setViews(false, false, false)
         if response.status == 200
-          cleanGameData(response.data['game'])
+          if response.data['game'] == undefined
+            statsDataSetup(response.data['stats'])
+          else
+            cleanGameData(response.data['game'])
       , (errors) ->
         scope.errorMessage = scope.helper.errorMessage(errors)
 
@@ -114,12 +147,15 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
 #  WATCH
 #  ================================
+  scope.$watch 'currentGameId', (newVal, oldVal) ->
+    if newVal != undefined && newVal.won && oldVal =! newVal
+      setViews(false, false, true)
 
   scope.$watch 'currentGame', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined
-      scope.gameView = true
+      setViews(false, true, false)
     else if newVal == undefined
-      scope.gameView = false
+      setViews(true, false, false)
 
   scope.$watch 'currentPlayer', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined
@@ -127,19 +163,28 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
   scope.$watch 'loggedIn', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined && newVal
-#      getOnlinePlayers()
-      scope.playerView = newVal && !scope.gameView
+      player = newVal && playerViewOnly()
+      if player
+        setViews(player, !player, !player)
+      else
+        setViews(player, undefined , undefined )
+
 
   scope.$watch 'gameView', (newVal, oldVal) ->
     if !newVal && scope.loggedIn
-      if scope.currentGameId
-        scope.loading = true
+      if scope.currentGameId && !scope.statsView
         getGame(scope.currentGameId.id)
-        scope.gameView = true
+        setViews(false, true, false)
       getOnlinePlayers()
-      scope.playerView = true
+      setViews(!scope.statsView, false, scope.statsView)
     else if newVal
       updateGame()
 
-  setViews()
+  scope.$watch 'backToPlayerView', (newVal, oldVal) ->
+    if newVal != undefined && newVal && newVal != oldVal
+      getPlayerData()
+      setViews(true, false, false)
+      scope.backToPlayerView = undefined
+
+  initViews()
 ])

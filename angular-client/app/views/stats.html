@@ -1,0 +1,52 @@
+<h1>{{header}}!</h1>
+
+<h3>This game:</h3>
+
+<table class="this-game-stats">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{{statsData.winner}}</th>
+      <th>{{statsData.loser}}</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <th>Hits</th>
+      <td>{{statsData.this_game[statsData.loser]['sunken']}}</td>
+      <td>{{statsData.this_game[statsData.winner]['sunken']}}</td>
+    </tr>
+    <tr>
+      <th>Miss</th>
+      <td>{{statsData.this_game[statsData.loser]['intact']}}</td>
+      <td>{{statsData.this_game[statsData.winner]['intact']}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>All games:</h3>
+<table class="all-games-stats">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{{statsData.winner}}</th>
+      <th>{{statsData.loser}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Wins</th>
+      <td>{{statsData.all_games[statsData.winner]}}</td>
+      <td>{{statsData.all_games[statsData.loser]}}</td>
+    </tr>
+    <tr>
+      <th>Games played</th>
+      <td colspan="2">{{statsData.all_games['total']}}</td>
+    </tr>
+    <tr>
+      <th>Games abandoned</th>
+      <td colspan="2">{{statsData.all_games['paused']}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-sm" ng-click="exitGame()">Find new game!</button>

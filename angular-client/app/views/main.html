@@ -26,5 +26,6 @@
 
   <div class="loading" ng-if="loading">Fetching your game...</div>
   <div game class="game" ng-if="gameView && !loading" game-data="currentGame"></div>
+  <div stats class="stats" ng-if="statsView && !loading" stats-data="gameStats" current-player="currentPlayer"></div>
 
 </div>
