@@ -40,6 +40,21 @@ table.my-board {
 .game table.my-board td.hit.ship {
   background-color: firebrick ;
 }
+.game table.my-board td.aircraft_carrier {
+  background-color: darkolivegreen;
+}
+.game table.my-board td.battleship {
+  background-color: darkcyan;
+}
+.game table.my-board td.cruiser {
+  background-color: darkblue;
+}
+.game table.my-board td.destroyer {
+  background-color: darkslategray;
+}
+.game table.my-board td.submarine {
+  background-color: orange;
+}
 .game table td {
   background-repeat: no-repeat;
 }

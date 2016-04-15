@@ -1,6 +1,5 @@
 class BoardSerializer < ApplicationSerializer
   attributes :id, :player_id, :board_fields
-  # has_many :fields
 
   def board_fields
     tmp = {}
@@ -11,7 +10,8 @@ class BoardSerializer < ApplicationSerializer
           row_index: f.row_index,
           column_index: f.column_index,
           is_ship_field: f.is_ship_field,
-          is_uncovered: f.is_uncovered
+          is_uncovered: f.is_uncovered,
+          ship_type: f.ship.try(:ship_type)
       }
     end
     tmp

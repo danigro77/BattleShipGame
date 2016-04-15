@@ -11,6 +11,9 @@ angular.module('battleShipGameApp').service "PlayerService", [ '$http', (http) -
   @saveNewPlayer = (data) ->
     http.post '/api/players/new/?player='+ JSON.stringify data
 
+  @exitGame = (playerId) ->
+    http.put 'api/players/finish_game/' + playerId
+    
   @playerLogout = (playerId) ->
     http.put 'api/players/logout/' + playerId
 

@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       get 'current' => 'players#current'
       get 'online/:id' => 'players#online'
       post 'new' => 'players#new'
+      put 'finish_game/:id' => 'players#finish_game'
       put 'logout/:id' => 'players#logout'
     end
     scope '/games' do

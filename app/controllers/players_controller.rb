@@ -42,10 +42,19 @@ class PlayersController < ApplicationController
     end
   end
 
+  def finish_game
+    player = Player.find(params[:id])
+    if player.update({playing_game_id: nil})
+      render nothing: true, status: 204
+    else
+      render json: player.errors, status: 400
+    end
+  end
+
   # PUT  /api/players/logout/:id(.:format) players#logout
   def logout
     player = Player.find(params[:id])
-    if player.update({logged_in: false})
+    if player.update({logged_in: false, playing_game: nil})
       render nothing: true, status: 200
     else
       render json: player.errors, status: 400

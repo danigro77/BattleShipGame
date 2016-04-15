@@ -1,0 +1,23 @@
+.stats {
+  text-align: center;
+}
+.stats table {
+  margin: 10px auto;
+  width: 400px;
+}
+.stats td, .stats th {
+  border: solid ghostwhite 1px;
+  text-align: center;
+  line-height: 2.5em;
+}
+.stats tbody th {
+  text-align: left;
+  width: 150px;
+  padding-left: 10px;
+}
+.stats tbody td {
+  width: 125px;
+}
+.stats button {
+  margin-top: 30px;
+}
