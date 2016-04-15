@@ -5,7 +5,7 @@ RSpec.describe GamesController, :type => :controller do
   let(:player2) { FactoryGirl.create(:player) }
 
   describe "POST #new" do
-    let(:expected_keys) { %w(id current_player_id player1 player2) }
+    let(:expected_keys) { %w(id current_player_id paused player1 player2 boards) }
 
     it 'loads successfully' do
       post :new, {player1: player1, player2: player2}
