@@ -70,7 +70,7 @@ FactoryGirl.define do
     factory :player_playing_game, traits: [:with_playing_game]
 
 
-    
+
   end
 
 end

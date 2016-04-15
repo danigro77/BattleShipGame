@@ -31,9 +31,7 @@ angular.module('battleShipGameApp').controller("GameCtrl", ['$scope', '$cookieSt
     scope.gameData.myTurn = false
     FieldService.uncoverField(field.id).then (response) ->
       if response.status == 200
-        for board_field in scope.gameData.opponentsGame.board.board_fields
-          if board_field.id == field.id
-            scope.gameData.opponentsGame.board.board_fields[field.id] = response.data.field
+        true
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 

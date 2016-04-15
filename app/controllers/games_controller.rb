@@ -15,8 +15,9 @@ class GamesController < ApplicationController
 
   def check_invites
     if params[:player_id]
-      games = Game.pending_invitations(params[:player_id]).select {|game| game.both_players_online? && game.not_paused? }
+      games = Game.pending_invitations(params[:player_id]).select {|game| game.both_players_online? && game.not_paused? && game.player2.playing_game == game }
       if games.present?
+        puts
         render json: games.map(&:id)
       else
         render json: [], status: 204
