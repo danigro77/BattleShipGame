@@ -32,17 +32,21 @@ RSpec.describe Board, type: :model do
     describe '.row' do
       it 'returns a single row of the board' do
         expect(board.row(0).map(&:row_index).uniq).to eq [0]
-        expect(board.row(0).map(&:column_index).sort).to eq (0..9).to_a
         expect(board.row(9).map(&:row_index).uniq).to eq [9]
-        expect(board.row(9).map(&:column_index).sort).to eq (0..9).to_a
+      end
+      it 'returns the fields in order of columns' do
+        expect(board.row(0).map(&:column_index)).to eq (0..9).to_a
+        expect(board.row(9).map(&:column_index)).to eq (0..9).to_a
       end
     end
     describe '.column' do
       it 'returns a single column of the board' do
         expect(board.column(0).map(&:column_index).uniq).to eq [0]
-        expect(board.column(0).map(&:row_index).sort).to eq (0..9).to_a
         expect(board.column(9).map(&:column_index).uniq).to eq [9]
-        expect(board.column(0).map(&:row_index).sort).to eq (0..9).to_a
+      end
+      it 'returns the fields in order of rows' do
+        expect(board.column(0).map(&:row_index)).to eq (0..9).to_a
+        expect(board.column(0).map(&:row_index)).to eq (0..9).to_a
       end
     end
   end
@@ -52,6 +56,14 @@ RSpec.describe Board, type: :model do
   describe 'Filter' do
     let!(:ships) { board.ships }
     let!(:fields) { board.fields }
+    let!(:num_ship_fields) { board.ships.inject(0) { |result, ship| result += ship.size } }
+
+    describe 'before_validation total_ship_fields' do
+      it 'adds the calculated value to the board' do
+        expect(board.total_ship_fields).to_not be nil
+        expect(board.total_ship_fields).to eq num_ship_fields
+      end
+    end
 
     describe 'after_create :create_ships' do
       it 'creates all the needed ships for the board' do
@@ -68,11 +80,11 @@ RSpec.describe Board, type: :model do
       it 'creates all the needed fields' do
         expect(fields.length).to eq 100
       end
-      xit 'fills them with the ships' do #TODO: test this more | it works in the app
-        num_of_fields = Board::SHIPS.values.inject(0) {|result, ship| result += ship[:quantity]*ship[:length]}
-        # puts fields.select {|field| field.ship }.map(&:ship).map(&:size)
-        # expect(fields.select {|field| field.ship }.length).to eq num_of_fields # 7 vs 18
-        expect(fields.map(&:ship_id).compact.length).to eq num_of_fields # 7 vs 18
+
+      it 'fills them with the ships' do
+        expect(fields.where('ship_id is not null').length).to eq num_ship_fields
+        expect(fields.where('ship_id is not null').length).to eq board.total_ship_fields
+        expect(fields.map(&:ship_id).compact.length).to eq board.ships.length
       end
     end
   end

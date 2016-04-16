@@ -55,8 +55,10 @@ class GamesController < ApplicationController
       game = Game.find(params[:id])
       player1, player2 = game.player1, game.player2
       data = {playing_game: nil}
-      if game.update({paused: true}) && player1.update(data) && player2.update(data)
-        render nothing: true, status: 204
+      if game.update({paused: true})
+        if player1.update(data) && player2.update(data)
+          render nothing: true, status: 204
+        end
       else
         render json: game.errors, status: 400
       end

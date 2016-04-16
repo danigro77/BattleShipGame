@@ -4,4 +4,5 @@ class Field < ActiveRecord::Base
   belongs_to :board
   belongs_to :ship
 
+  scope :get_hits, -> { where("ship_id IS NOT NULL").where(is_uncovered: true) }
 end

@@ -40,7 +40,8 @@ angular.module('battleShipGameApp').controller("GameCtrl", ['$scope', '$cookieSt
     GameService.pauseGame(scope.gameData.id).then (response) ->
       if response.status == 204
         cookieStore.remove('currentGame')
-        scope.$parent.$parent.gameView = false
+        scope.$parent.backToPlayerView = true
+        scope.$parent.$parent.backToPlayerView = true
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 

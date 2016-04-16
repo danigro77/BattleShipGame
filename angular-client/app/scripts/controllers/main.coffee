@@ -9,15 +9,29 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
   scope.loading = false
 
   setViews = (player, game, stats) ->
-    scope.playerView = player if player != undefined
-    scope.gameView = game if game != undefined
-    scope.statsView = stats if stats != undefined
+    scope.playerView = player && scope.loggedIn if player != undefined
+    scope.gameView = game && scope.loggedIn if game != undefined
+    scope.statsView = stats && scope.loggedIn if stats != undefined
+
+  setNoView = ->
+    setViews(false, false, false)
+  setPlayerView = ->
+    setViews(true, false, false)
+  setGameView = ->
+    setViews(false, true, false)
+  setStatsView = ->
+    setViews(false, false, true)
 
   initViews = ->
     scope.loggedIn = scope.currentPlayer != undefined
     game = scope.loggedIn && scope.currentGameId != undefined && !scope.currentGameId.won
     stats = scope.loggedIn && scope.currentGameId != undefined && scope.currentGameId.won
     player = scope.loggedIn && !game && !stats
+    if player
+      getOnlinePlayers()
+    else
+      getGame(scope.currentGameId.id)
+
     setViews(player, game, stats)
 
   playerViewOnly = ->
@@ -36,6 +50,7 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
       if response.status == 200
         players = response.data['players']
         scope.onlinePlayers = players
+        scope.loading = false
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
@@ -57,7 +72,7 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         scope.currentPlayer = undefined
         scope.loggedIn = false
         scope.loading = false
-        setViews(false, false, false)
+        setNoView()
     , (errors) ->
       scope.errorMessage = scope.helper.errorMessage(errors)
 
@@ -70,6 +85,8 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
           cookieStore.put('currentGame', {id: response.data['games'][0]})
           scope.currentGameId = cookieStore.get('currentGame')
           getGame(response.data['games'][0])
+          scope.loading = true
+          updateGame()
       , (errors) ->
         scope.errorMessage = scope.helper.errorMessage(errors)
 
@@ -83,7 +100,12 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
   pausedGame = ->
     cookieStore.remove('currentGame')
-    setViews(true, false, false)
+    scope.currentGameId = undefined
+    scope.currentGame = undefined
+    getOnlinePlayers()
+    setPlayerView()
+    scope.loading = false
+    getPlayerData()
 
   cleanGameData = (gameData) ->
     if gameData.paused
@@ -102,14 +124,14 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
         else
           setBoards(gameData.boards[1], gameData.boards[0])
       scope.currentGame.myTurn = gameData['current_player_id'] == scope.currentPlayer.id
+      if scope.currentGame
+        setGameView()
     scope.loading = false
-    setViews(false, true, false)
+
 
   updateGame = ->
     if gameViewOnly()
       setInterval ->
-        if !scope.currentGameId #TODO: find and fix bug
-          scope.currentGameId = cookieStore.get('currentGame')
         if scope.currentGameId && (scope.gameView || scope.statsView) && scope.loggedIn
           getGame(scope.currentGameId.id)
       , 5000
@@ -117,13 +139,13 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
   statsDataSetup = (data) ->
     scope.gameStats = data
     cookieStore.put('currentGame', {id: data.id, won: true})
-    setViews(false, false, true)
+    setStatsView()
     scope.loading = false
 
   getGame = (id) ->
     if id != undefined && scope.gameStats == undefined
       GameService.getGame(id).then (response) ->
-        setViews(false, false, false)
+        setNoView()
         if response.status == 200
           if response.data['game'] == undefined
             statsDataSetup(response.data['stats'])
@@ -148,14 +170,23 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 #  WATCH
 #  ================================
   scope.$watch 'currentGameId', (newVal, oldVal) ->
-    if newVal != undefined && newVal.won && oldVal =! newVal
-      setViews(false, false, true)
-
-  scope.$watch 'currentGame', (newVal, oldVal) ->
-    if newVal != oldVal && newVal != undefined
-      setViews(false, true, false)
-    else if newVal == undefined
-      setViews(true, false, false)
+    if newVal != undefined && oldVal =! newVal
+      if newVal.won
+        setStatsView()
+      else
+        setNoView()
+        scope.loading = true
+        updateGame()
+        getGame(newVal)
+    else if newVal != oldVal
+      cookie = cookieStore.get('currentGame')
+      if cookie != undefined
+        getGame(cookie.id)
+        updateGame()
+      else
+        getPlayerData()
+        getOnlinePlayers()
+        setPlayerView()
 
   scope.$watch 'currentPlayer', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined
@@ -163,27 +194,16 @@ angular.module('battleShipGameApp').controller("MainCtrl", ['$scope', '$cookieSt
 
   scope.$watch 'loggedIn', (newVal, oldVal) ->
     if newVal != oldVal && newVal != undefined && newVal
-      player = newVal && playerViewOnly()
-      if player
-        setViews(player, !player, !player)
+      switchToPlayer = newVal && playerViewOnly()
+      if switchToPlayer
+        setPlayerView()
       else
         setViews(player, undefined , undefined )
-
-
-  scope.$watch 'gameView', (newVal, oldVal) ->
-    if !newVal && scope.loggedIn
-      if scope.currentGameId && !scope.statsView
-        getGame(scope.currentGameId.id)
-        setViews(false, true, false)
-      getOnlinePlayers()
-      setViews(!scope.statsView, false, scope.statsView)
-    else if newVal
-      updateGame()
 
   scope.$watch 'backToPlayerView', (newVal, oldVal) ->
     if newVal != undefined && newVal && newVal != oldVal
       getPlayerData()
-      setViews(true, false, false)
+      setPlayerView()
       scope.backToPlayerView = undefined
 
   initViews()
