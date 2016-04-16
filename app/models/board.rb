@@ -21,7 +21,9 @@ class Board < ActiveRecord::Base
           quantity: 2
       }
   }
-  validates_presence_of :player_id, :game_id
+  validates_presence_of :player_id, :game_id, :total_ship_fields
+
+  before_validation :set_total_ship_fields
 
   after_create :create_ships
   after_create :set_fields
@@ -32,15 +34,15 @@ class Board < ActiveRecord::Base
   has_many :ships
 
   def row(index)
-    fields.where(row_index: index)
+    fields.where(row_index: index).sort_by { |f| f.column_index}
   end
 
   def column(index)
-    fields.where(column_index: index)
+    fields.where(column_index: index).sort_by { |f| f.row_index}
   end
 
   def lost?
-    stats[player.name] && stats[player.name][:sunken] == ships.length
+    set_total_ship_fields == fields.get_hits.length
   end
 
   def stats
@@ -50,7 +52,6 @@ class Board < ActiveRecord::Base
         intact: 0
     }
     ships.each do |ship|
-      ship.check_if_sunken unless ship.sunk
       ship.sunk? ? (stats[player.name][:sunken] += 1) : (stats[player.name][:intact] += 1)
     end
     stats
@@ -76,6 +77,10 @@ class Board < ActiveRecord::Base
     place_ships
   end
 
+  def set_total_ship_fields
+    self.total_ship_fields = SHIPS.values.inject(0) {|result, ship| result += ship[:quantity]*ship[:length]}
+  end
+
   def place_ships
     @all_fields = self.fields
     self.ships.each do |ship|
@@ -99,7 +104,7 @@ class Board < ActiveRecord::Base
         return slots if slots.length == length
         next if distance == 0
         current_field = get_field(slots.first, distance, direction)
-        if  current_field.nil? || current_field.ship
+        if current_field.nil? || current_field.ship
           slots = [slots.first]
           break
         else
@@ -112,18 +117,14 @@ class Board < ActiveRecord::Base
 
   def get_field(start_field, distance, direction)
     current_slice = case direction
-                      when :down
-                        column(start_field.column_index)
-                      when :up
+                      when :down, :up
                         column(start_field.column_index)
                       else
                         row(start_field.row_index)
                     end
     start_index = current_slice.index(start_field)
     index = case direction
-              when :up
-                start_index-distance
-              when :left
+              when :up, :left
                 start_index-distance
               else
                 start_index+distance

@@ -4,8 +4,8 @@ class FieldsController < ApplicationController
     if params[:id]
       field = Field.find(params[:id].to_i)
       if field.update(is_uncovered: true)
-        game = field.board.game
-        game.change_current_player
+        field.ship.try(:set_if_sunken)
+        field.board.game.change_current_player
         render json: field, serializer: FieldSerializer
       else
         render json: field.errors, status: 400

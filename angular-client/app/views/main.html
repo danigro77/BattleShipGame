@@ -8,7 +8,7 @@
   </div>
   <div player class="main main-identify" ng-if="!loggedIn"></div>
 
-  <div class="main" ng-if="playerView">
+  <div class="main" ng-if="playerView && !loading">
     Welcome to the game, {{currentPlayer.name}}!
     <div class="online-list" ng-if="onlinePlayers.length == 0">
       <p>Sorry, no other player is right now online. Try again later!</p>
